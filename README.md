@@ -13,7 +13,9 @@ pip install pysqlite3
 ### Create SQLite instance
 
 ```python
-sqlite = SQLite('data.db')
+from sqlite import SQLite
+
+sql_db = SQLite('data.db')
 ```
 
 ### SELECT
@@ -35,7 +37,7 @@ Here:
 **Example**
 
 ```python
-with sqlite as db:
+with sql_db as db:
 	results = db.select('users', fields=['id', 'login', 'password'], where={'username': 'john_smith'})
 ```
 
@@ -54,7 +56,7 @@ Here:
 **Example**
 
 ```python
-with sqlite as db:
+with sql_db as db:
 	db.insert('users', {'login': 'john_smith', 'password': 'john_pass', 'first_name': 'John', 'last_name': 'Smith'})
 ```
 
@@ -74,7 +76,7 @@ Here:
 **Example**
 
 ```python
-with sqlite as db:
+with sql_db as db:
 	db.update('users', values={'login': 'Johanes'}, where={'login': 'John'})
 ```
 
@@ -93,6 +95,6 @@ Here:
 **Example**
 
 ```python
-with sqlite as db:
+with sql_db as db:
 	db.delete('users', where={'login': 'John'})
 ```

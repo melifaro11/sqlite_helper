@@ -18,17 +18,16 @@ class SQLite():
 		dbfile: str
 			Name of the SQLite database file
         """
+        self.__conn = None
+        self.__cursor = None
+
         self.__dbfile = dbfile
 
     def __enter__(self) -> None:
         """
         Open database connection
         """
-        try:
-            self.__conn = sqlite3.connect(self.__dbfile)
-            self.__cursor = self.__conn.cursor()
-        except Exception as e:
-            raise SQLiteException(f'Error by opening SQLite database: {e}')
+        self.open()
 
         return self
 
@@ -36,7 +35,35 @@ class SQLite():
         """
         Close database connection
         """
-        self.__conn.close()
+        self.close()
+        
+    def open(self) -> None:
+        """
+        Open database connection
+        """
+        try:
+            if self.__conn is not None:
+                self.close()
+
+            self.__conn = sqlite3.connect(self.__dbfile)
+            self.__cursor = self.__conn.cursor()
+        except Exception as e:
+            raise SQLiteException(f'Error by opening SQLite database: {e}')
+        
+    def close(self) -> None:
+        """
+        Close database connection
+        """
+        if self.__conn is not None:
+            self.__conn.close()
+            self.__conn = None
+            
+    def __check_connection(self) -> None:
+        """
+        Raises SQLiteException, if no connection to the database
+        """
+        if self.__conn is None:
+            raise SQLiteException("No connection to database")
 
     def __create_select_statement(self, table_name: str, fields: list[str]) -> str:
         """
@@ -83,6 +110,8 @@ class SQLite():
         where: dict[str, str]
             Dictionary with fields and values to filter request
         """
+        self.__check_connection()
+
         try:
             if fields is None:
                 self.__cursor.execute(f'PRAGMA table_info("{table_name}")')
@@ -125,6 +154,8 @@ class SQLite():
         values : dict[str, str]
             The values to insert
         """
+        self.__check_connection()
+
         try:
             query = f'INSERT INTO {table_name}('
             insert_values = '';
@@ -150,6 +181,8 @@ class SQLite():
         """
         Update table from a dictonary values
         """
+        self.__check_connection()
+
         try:
             query = f'UPDATE "{table_name}" SET '
 
@@ -171,6 +204,8 @@ class SQLite():
         """
         Delete record(s) from table
         """
+        self.__check_connection()
+
         try:
             query = f'DELETE FROM "{table_name}" ';
 
@@ -185,6 +220,8 @@ class SQLite():
         """
         Perforum custom SELECT-request
         """
+        self.__check_connection()
+
         try:
             self.__cursor.executescript(query)
             if commit:
@@ -196,16 +233,19 @@ class SQLite():
         """
         Start transaction
         """
+        self.__check_connection()
         self.__cursor.execute('BEGIN TRANSACTION')
 
     def commit_transaction(self) -> None:
         """
         Commit transaction
         """
+        self.__check_connection()
         self.__cursor.execute('COMMIT')
 
     def rollback_transaction(self) -> None:
         """
         Rollback transaction
         """
+        self.__check_connection()
         self.__cursor.execute('ROLLBACK')

@@ -40,10 +40,10 @@ class SQLite():
 
     def __create_select_statement(self, table_name: str, fields: list[str]) -> str:
         """
-        Create "SELECT field1, field2, field3 FROM table"-Statement from the
-        fields list
+        Create SELECT statement from the fields list
         """
         query = 'SELECT '
+
         for idx, field in enumerate(fields):
             if idx == 0:
                 query += f'"{field}"'
@@ -58,7 +58,7 @@ class SQLite():
         """
         Create WHERE-statement from the dictionary
         """
-        query = 'WHERE ';
+        query = 'WHERE '
 
         for idx, param in enumerate(where.keys()):
             value = where[param]

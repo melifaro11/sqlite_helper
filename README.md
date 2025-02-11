@@ -1,6 +1,6 @@
-# Python SQLite helper
+# Python SQLite Helper
 
-SQL Helper is a small class that makes it easier to work with SQLite databases in python.
+SQL Helper is a small class that simplifies working with SQLite databases in Python.
 
 ## Installation
 
@@ -18,7 +18,7 @@ sqlite = SQLite('data.db')
 
 ### SELECT
 
-The ```select()``` method of the SQLite-instance is used to retrieve data from the database.
+The ```select()``` method of the SQLite instance is used to retrieve data from the database.
 
 ```python
 def select(table_name, fields=None, where=None, orderby=None, groupby=None)
@@ -26,11 +26,11 @@ def select(table_name, fields=None, where=None, orderby=None, groupby=None)
 
 Here:
 
-- ```table_name```: Name of the table
-- ```fields```: A list of fields to select (```None``` for all)
-- ```where```: Dictionary for the WHERE-clause, where key is the field name, and value is the field value
-- ```orderby```: The field name to sorting results
-- ```groupby```: The field name to grouping results
+- ```table_name```: Name of the table.
+- ```fields```: A list of fields to select. Use ```None``` to select all fields.
+- ```where```: A dictionary for the WHERE clause, where the key is the field name and the value is the field value.
+- ```orderby```: The field name used to sort results.
+- ```groupby```: The field name used to group results.
 
 **Example**
 
@@ -41,15 +41,15 @@ with sqlite as db:
 
 ### INSERT
 
-The ```insert()``` method of the SQLite-instance is used to add a record to the database.
+The ```insert()``` method of the SQLite instance is used to add a record to the database.
 
 ```python
 def insert(table_name, values)
 ```
 
 Here:
-- ```table_name```: Name of the table
-- ```values```: Dictionary with values to add
+- ```table_name```: Name of the table.
+- ```values```: A dictionary containing the values to add.
 
 **Example**
 
@@ -67,9 +67,9 @@ update(table_name, values, where=None)
 ```
 
 Here:
-- ```table_name```: Name of the table
-- ```values```: Dictionary with fields and values to update
-- ```where```: Dictionary for the WHERE-clause, where key is the field name, and value is the field value
+- ```table_name```: Name of the table.
+- ```values```: A dictionary with fields and values to update.
+- ```where```: A dictionary for the WHERE clause, where the key is the field name and the value is the field value.
 
 **Example**
 
@@ -80,7 +80,7 @@ with sqlite as db:
 
 ### DELETE
 
-The ```delete()``` method of the SQLite-instance is used to delete a record from a table.
+The ```delete()``` method of the SQLite instance is used to remove a record from a table.
 
 ```python
 def delete(table_name, where=None)
@@ -88,7 +88,7 @@ def delete(table_name, where=None)
 
 Here:
 - ```table_name```: Name of the table
-- ```where```: Dictionary for the WHERE-clause, where key is the field name, and value is the field value
+- ```where```: A dictionary for the WHERE clause, where the key is the field name and the value is the field value.
 
 **Example**
 

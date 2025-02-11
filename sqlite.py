@@ -6,32 +6,43 @@ class SQLiteException(Exception):
 
 
 class SQLite():
-    ''' Class to working with SQLite databases '''
-    def __init__(self, dbfile):
-        ''' Initialize SQLite()
+    """
+	Helper class to working with SQLite databases
+	"""
+    def __init__(self, dbfile: str) -> None:
+        """
+		Initialize SQLite()
 
-            Keyword arguments:
-                dbfile -- Name of the SQLite database file
-        '''
+		Parameters
+		----------
+		dbfile: str
+			Name of the SQLite database file
+        """
         self.__dbfile = dbfile
 
-    def __enter__(self):
-        ''' Open database connection '''
+    def __enter__(self) -> None:
+        """
+        Open database connection
+        """
         try:
             self.__conn = sqlite3.connect(self.__dbfile)
             self.__cursor = self.__conn.cursor()
         except Exception as e:
-			raise SQLiteException(f'Error by opening SQLite database: {e}')
+            raise SQLiteException(f'Error by opening SQLite database: {e}')
 
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        ''' Close database connection '''
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+        """
+        Close database connection
+        """
         self.__conn.close()
 
-    def __create_select_statement(self, table_name, fields):
-        ''' Create "SELECT field1, field2, field3 FROM table"-Statement from
-        fields list '''
+    def __create_select_statement(self, table_name: str, fields: list[str]) -> str:
+        """
+        Create "SELECT field1, field2, field3 FROM table"-Statement from the
+        fields list
+        """
         query = 'SELECT '
         for idx, field in enumerate(fields):
             if idx == 0:
@@ -43,9 +54,12 @@ class SQLite():
 
         return query
 
-    def __create_where_statement(self, where):
-        ''' Create "WHERE"-Statement from "where"-dictionary '''
+    def __create_where_statement(self, where: dict[str, str]) -> str:
+        """
+        Create WHERE-statement from the dictionary
+        """
         query = 'WHERE ';
+
         for idx, param in enumerate(where.keys()):
             value = where[param]
 
@@ -56,14 +70,19 @@ class SQLite():
 
         return query
 
-    def select(self, table_name, fields=None, where=None, orderby=None, groupby=None):
-        ''' Select records from table
+    def select(self, table_name: str, fields: list[str] = None, where: dict[str, str] = None, orderby: str = None, groupby: str = None) -> list[dict[str, str]]:
+        """
+        Select records from table
 
-            Keyword arguments:
-                table_name -- Name of the table to select
-                fields -- List of fields to select
-                where -- dictionary with fields and values to filter request
-        '''
+        Parameters
+        ----------
+        table_name: str
+            Name of the table to select
+        fields: list[str]
+            List of fields to select
+        where: dict[str, str]
+            Dictionary with fields and values to filter request
+        """
         try:
             if fields is None:
                 self.__cursor.execute(f'PRAGMA table_info("{table_name}")')
@@ -95,7 +114,17 @@ class SQLite():
         except Exception as e:
             raise SQLiteException(f'Database exception: {e}')
 
-    def insert(self, table_name, values):
+    def insert(self, table_name: str, values: dict[str, str]) -> None:
+        """
+        Insert new record into the database
+
+        Parameters
+        ----------
+        table_name : str
+            Name of the table
+        values : dict[str, str]
+            The values to insert
+        """
         try:
             query = f'INSERT INTO {table_name}('
             insert_values = '';
@@ -117,8 +146,10 @@ class SQLite():
         except Exception as e:
             raise SQLiteException(f'Database exception: {e}')
 
-    def update(self, table_name, values, where=None):
-        ''' Update table from a dictonary values '''
+    def update(self, table_name: str, values: dict[str, str], where: dict[str, str] = None) -> None:
+        """
+        Update table from a dictonary values
+        """
         try:
             query = f'UPDATE "{table_name}" SET '
 
@@ -136,8 +167,10 @@ class SQLite():
         except Exception as e:
             raise SQLiteException(f'Database exception: {e}')
 
-    def delete(self, table_name, where=None):
-        ''' Delete record(s) from table '''
+    def delete(self, table_name: str, where: dict[str, str] = None) -> None:
+        """
+        Delete record(s) from table
+        """
         try:
             query = f'DELETE FROM "{table_name}" ';
 
@@ -148,8 +181,10 @@ class SQLite():
         except Exception as e:
             raise SQLiteException(f'Database exception: {e}')
 
-    def custom_select(self, query, commit=False):
-        ''' Perforum custom SELECT-request '''
+    def custom_select(self, query: str, commit: bool = False) -> None:
+        """
+        Perforum custom SELECT-request
+        """
         try:
             self.__cursor.executescript(query)
             if commit:
@@ -157,11 +192,20 @@ class SQLite():
         except Exception as e:
             raise SQLiteException(f'Database exception: {e}')
 
-    def start_transaction(self):
+    def start_transaction(self) -> None:
+        """
+        Start transaction
+        """
         self.__cursor.execute('BEGIN TRANSACTION')
 
-    def commit_transaction(self):
+    def commit_transaction(self) -> None:
+        """
+        Commit transaction
+        """
         self.__cursor.execute('COMMIT')
 
-    def rollback_transaction(self):
+    def rollback_transaction(self) -> None:
+        """
+        Rollback transaction
+        """
         self.__cursor.execute('ROLLBACK')

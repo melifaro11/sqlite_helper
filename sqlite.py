@@ -1,5 +1,9 @@
 import sqlite3
-from logger import create_db_loggers
+
+
+class SQLiteException(Exception):
+	pass
+
 
 class SQLite():
     ''' Class to working with SQLite databases '''
@@ -10,7 +14,6 @@ class SQLite():
                 dbfile -- Name of the SQLite database file
         '''
         self.__dbfile = dbfile
-        self.__logger = create_db_loggers()
 
     def __enter__(self):
         ''' Open database connection '''
@@ -18,7 +21,7 @@ class SQLite():
             self.__conn = sqlite3.connect(self.__dbfile)
             self.__cursor = self.__conn.cursor()
         except Exception as e:
-            self.__logger.error(f'DB connection error: {e}')
+			raise SQLiteException(f'Error by opening SQLite database: {e}')
 
         return self
 
@@ -77,7 +80,6 @@ class SQLite():
             if groupby is not None:
                 query += f' GROUP BY {groupby}'
 
-            self.__logger.debug(f'Execute query: {query}')
             self.__cursor.execute(query)
 
             db_result = self.__cursor.fetchall();
@@ -91,7 +93,7 @@ class SQLite():
 
             return result
         except Exception as e:
-            self.__logger.error(f'DB error: {e}')
+            raise SQLiteException(f'Database exception: {e}')
 
     def insert(self, table_name, values):
         try:
@@ -108,13 +110,12 @@ class SQLite():
 
             query += f') VALUES ({insert_values})'
 
-            self.__logger.debug(f'Execute query: {query}')
             self.__cursor.execute(query)
             self.__conn.commit()
 
             return self.__cursor.lastrowid
         except Exception as e:
-            self.__logger.error(f'DB error: {e}')
+            raise SQLiteException(f'Database exception: {e}')
 
     def update(self, table_name, values, where=None):
         ''' Update table from a dictonary values '''
@@ -131,10 +132,9 @@ class SQLite():
             if where is not None:
                 query += ' ' + self.__create_where_statement(where)
 
-            self.__logger.debug(f'Execute query: {query}')
             self.__cursor.executescript(query)
         except Exception as e:
-            self.__logger.error(f'DB error: {e}')
+            raise SQLiteException(f'Database exception: {e}')
 
     def delete(self, table_name, where=None):
         ''' Delete record(s) from table '''
@@ -144,20 +144,18 @@ class SQLite():
             if where is not None:
                 query += self.__create_where_statement(where)
 
-            self.__logger.debug(f'Execute query: {query}')
             self.__cursor.executescript(query)
         except Exception as e:
-            self.__logger.error(f'DB error: {e}')
+            raise SQLiteException(f'Database exception: {e}')
 
     def custom_select(self, query, commit=False):
         ''' Perforum custom SELECT-request '''
         try:
-            self.__logger.debug(f'Execute query: {query}')
             self.__cursor.executescript(query)
             if commit:
                 self.__conn.commit()
         except Exception as e:
-            self.__logger.error(f'DB error: {e}')
+            raise SQLiteException(f'Database exception: {e}')
 
     def start_transaction(self):
         self.__cursor.execute('BEGIN TRANSACTION')
